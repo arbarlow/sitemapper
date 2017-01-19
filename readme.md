@@ -2,7 +2,7 @@
 
 A simple, fairly hacky, fairly quickly made web scraper.
 
-Can find, scripts, stylesheets, images and links in any document and outputs a JSON file.
+It can find scripts, stylesheets, images and links in any document and outputs a JSON file.
 
 ## Usage
 ```
@@ -10,9 +10,9 @@ go get github.com/arbarlow/sitemapper
 URL=https://example.com/ sitemapper
 ```
 
-When finished the scraper will output an 'sitemap.json' file and by default using 3 concurrent scrapers.
+When finished the scraper will output an 'sitemap.json' file and by default use 3 concurrent scrapers.
 
-Feel free to play around with `numberOfWorkers` that variable in `main.go`
+Feel free to play around with the `numberOfWorkers` variable in `main.go`
 
 ## Issues
 Doesn't parse CSS/JS to calculate dependencies that are loaded via dependencies.
