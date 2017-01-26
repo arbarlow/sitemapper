@@ -31,7 +31,7 @@ func main() {
 		log.Fatal("URL ENV variable is required")
 	}
 
-	parse(baseURL)
+	scrape(baseURL)
 
 	f, err := os.Create("sitemap.json")
 	if err != nil {
@@ -45,7 +45,7 @@ func main() {
 		len(scraped), len(results), len(errors))
 }
 
-func parse(baseURL string) {
+func scrape(baseURL string) {
 	url, err := url.Parse(baseURL)
 	if err != nil {
 		log.Fatalf("Error parsing URL: %v", err)
