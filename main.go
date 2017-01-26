@@ -12,7 +12,7 @@ import (
 	"github.com/arbarlow/sitemapper/scraper"
 )
 
-var lock = &sync.Mutex{}
+var lock = &sync.RWMutex{}
 
 var numberOfWorkers = 3
 var workerState = make([]bool, numberOfWorkers)
@@ -31,6 +31,21 @@ func main() {
 		log.Fatal("URL ENV variable is required")
 	}
 
+	scrape(baseURL)
+
+	f, err := os.Create("sitemap.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	enc := json.NewEncoder(f)
+	enc.SetIndent("", "  ")
+	enc.Encode(results)
+	log.Printf("Scraped %d URLS, %d Results, %d Errors -- Output: sitemap.json",
+		len(scraped), len(results), len(errors))
+}
+
+func scrape(baseURL string) {
 	url, err := url.Parse(baseURL)
 	if err != nil {
 		log.Fatalf("Error parsing URL: %v", err)
@@ -45,17 +60,6 @@ func main() {
 
 	queue <- url.String()
 	<-finished
-
-	f, err := os.Create("sitemap.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	enc := json.NewEncoder(f)
-	enc.SetIndent("", "  ")
-	enc.Encode(results)
-	log.Printf("Scraped %d URLS, %d Results, %d Errors -- Output: sitemap.json",
-		len(scraped), len(results), len(errors))
 }
 
 func worker(n int) {
@@ -67,9 +71,9 @@ func worker(n int) {
 		path := path.Clean(loc.Path)
 
 		// Lock reading and writing so a worker doesn't pick up the same URL
-		lock.Lock()
+		lock.RLock()
 		_, done := scraped[path]
-		lock.Unlock()
+		lock.RUnlock()
 
 		if !done {
 			lock.Lock()
